@@ -1,0 +1,9 @@
+data/*
+!data/.gitkeep
+__pycache__/
+*.py[cod]
+.venv/
+.vscode/
+.env
+.env.*
+!.env.example
