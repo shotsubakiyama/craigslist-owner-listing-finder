@@ -144,6 +144,73 @@ Example options include:
 python src\main.py --listing-passes 3 --limit 20 --min-score 65
 ```
 
+
+## Seattle Market Pulse (optional)
+
+The HTML shortlist now includes **four compact rental market cards above the existing
+listing tiles**: rent growth (Seattle metro vs. United States), rental vacancy,
+time to lease, and rental concessions. Each card explicitly labels its geography,
+data month, and source. The original rental shortlist and scoring are unchanged.
+
+**The daily pipeline never downloads market data.** It reads
+`data/market_pulse.json` (if present) and renders the latest cached
+monthly observations. Missing data is labeled unavailable, never replaced with
+made-up figures. The data cache is excluded from Git along with other local data.
+
+To fetch the latest Zillow metro rent index and compute Seattle vs. U.S.
+year-over-year rent growth, run this **separately**, ideally weekly:
+
+```powershell
+python src\update_market_pulse.py
+```
+
+The source is Zillow Research's public, seasonally adjusted monthly ZORI CSV.
+A network failure preserves the last good cache. The script does not modify
+listings or other Grey Cells data. The cache refresh does not run automatically
+until you separately schedule it on your computer.
+
+For the remaining three cards, use the monthly downloadable metro-level
+datasets from [Apartment List](https://www.apartmentlist.com/research/category/data-rent-estimates).
+Save the wide-format Seattle metro datasets as:
+
+- `data/market_sources/vacancy.csv` — Apartment List Vacancy Index
+- `data/market_sources/time_to_lease.csv` — Apartment List Time On Market
+- `data/market_sources/concessions.csv` — Apartment List Concession Rates
+
+Each CSV needs a `RegionName` or `location` column with a Seattle-Tacoma-Bellevue
+metro row and month columns in `YYYY-MM` or `YYYY-MM-DD` format.
+Vacancy and concessions may use either fractions (0.061) or percentage
+points (6.1); time to lease is in days. If the downloaded format is different,
+convert it to this format rather than guessing at column meanings.
+
+Once the files are in place, refresh all available cards:
+
+```powershell
+python src\update_market_pulse.py --no-download
+```
+
+That command uses local CSVs only and preserves the previous Zillow values.
+The regular updater refreshes Zillow and any Apartment List CSVs present.
+Apartment List file downloads have **not yet been automated** because a stable
+direct download endpoint has not been verified. To use the latest data, replace
+the CSVs when new monthly releases are published.
+
+Concessions here mean the **percentage of properties offering discounts worth
+at least one month of rent**, not the percentage discount on monthly rent.
+The Apartment List vacancy and concessions samples are more representative
+of professionally managed rentals than Grey Cells' owner-managed target niche.
+
+To run the offline tests:
+
+```powershell
+python -m unittest discover -s tests -v
+```
+
+### Data sources
+
+- [Zillow ZORI](https://www.zillow.com/research/data/) — metro asking rents
+- [Apartment List public data](https://www.apartmentlist.com/research/category/data-rent-estimates) — vacancy, leasing time, and concessions
+
 ## Generated Files
 
 The pipeline writes generated files to the local `data` directory, including:

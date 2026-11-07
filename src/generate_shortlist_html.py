@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from db import get_connection
+from market_pulse import MARKET_PULSE_CSS, render_market_pulse
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -426,6 +427,7 @@ def render_html(rows: list[tuple], output_path: Path, min_score: int) -> str:
     generated_at = datetime.now().strftime("%Y-%m-%d %H:%M")
 
     summary_tiles = render_summary_tiles(rows)
+    market_pulse = render_market_pulse()
 
     detail_cards = "\n".join(
         render_listing_card(rank, row)
@@ -826,6 +828,8 @@ def render_html(rows: list[tuple], output_path: Path, min_score: int) -> str:
       margin-bottom: 4px;
     }}
 
+    {MARKET_PULSE_CSS}
+
     @media (max-width: 700px) {{
       body {{
         padding: 16px;
@@ -853,6 +857,8 @@ def render_html(rows: list[tuple], output_path: Path, min_score: int) -> str:
         Generated {html.escape(generated_at)} · {len(rows)} deduped listings · min score {min_score} · {html.escape(str(output_path.name))}
       </div>
     </header>
+
+    {market_pulse}
 
     {summary_tiles}
 
