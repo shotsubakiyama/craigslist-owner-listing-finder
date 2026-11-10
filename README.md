@@ -2,6 +2,15 @@
 
 A local rental-discovery pipeline that identifies and ranks likely owner-managed, human-written Craigslist listings.
 
+## Design principles
+
+This project is intentionally built around a few simple principles:
+
+- **Explainable by default** — ranking decisions should be traceable to visible signals rather than hidden scores.
+- **Local-first and reviewable** — storage and reports stay on the user's machine so results can be inspected directly.
+- **Privacy-conscious** — live scraped listings, contact details, addresses, and generated reports are excluded from Git.
+- **Practical over overengineered** — the current rule-based model is designed to be useful and easy to refine before adding more complex machine-learning approaches.
+
 ## The Problem
 
 Standard rental-search filters focus on structured criteria such as price, location, bedroom count, and posting date. Those filters are useful, but they do not reliably distinguish between:
